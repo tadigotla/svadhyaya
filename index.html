@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Svādhyāya — A Sanskrit Reflection Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --parchment: #f4ecd8;
+    --parchment-deep: #ebdfc2;
+    --parchment-shadow: #d9c9a3;
+    --ink: #1f1a14;
+    --ink-soft: #3d332a;
+    --ink-muted: #6b5d4d;
+    --sienna: #933a16;
+    --sienna-soft: #b8522a;
+    --gold: #8b6f2a;
+    --divider: #c9b78f;
+    --danger: #8b1a1a;
+    --serif-display: 'Cormorant Garamond', 'Georgia', serif;
+    --serif-body: 'EB Garamond', 'Georgia', serif;
+    --devanagari: 'Noto Serif Devanagari', serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--parchment);
+    color: var(--ink);
+    font-family: var(--serif-body);
+    font-size: 18px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Subtle paper texture using layered gradients */
+  body {
+    background-image:
+      radial-gradient(ellipse at top left, rgba(217, 201, 163, 0.25) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(147, 58, 22, 0.06) 0%, transparent 60%),
+      radial-gradient(circle at 20% 80%, rgba(139, 111, 42, 0.05) 0%, transparent 40%);
+  }
+
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+  }
+
+  /* ===== Header ===== */
+  header {
+    text-align: center;
+    padding-bottom: 2.5rem;
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--divider);
+    position: relative;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 7px;
+    background: var(--parchment);
+    border-left: 1px solid var(--divider);
+    border-right: 1px solid var(--divider);
+  }
+
+  .devanagari-title {
+    font-family: var(--devanagari);
+    font-size: 2.2rem;
+    color: var(--sienna);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.3rem;
+    font-weight: 400;
+  }
+
+  h1 {
+    font-family: var(--serif-display);
+    font-size: 3rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    margin-bottom: 0.6rem;
+  }
+
+  .subtitle {
+    font-family: var(--serif-body);
+    font-style: italic;
+    color: var(--ink-muted);
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+  }
+
+  /* ===== Navigation ===== */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid var(--divider);
+    padding-bottom: 0;
+  }
+
+  .tab {
+    background: none;
+    border: none;
+    font-family: var(--serif-display);
+    font-size: 1.2rem;
+    color: var(--ink-muted);
+    padding: 0.75rem 0.5rem;
+    cursor: pointer;
+    position: relative;
+    letter-spacing: 0.04em;
+    transition: color 0.25s;
+    font-weight: 500;
+  }
+
+  .tab:hover { color: var(--ink); }
+
+  .tab.active {
+    color: var(--sienna);
+  }
+
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--sienna);
+  }
+
+  /* ===== Views ===== */
+  .view { display: none; animation: fadeIn 0.4s ease-out; }
+  .view.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== Form ===== */
+  .session-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr 120px;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    background: rgba(235, 223, 194, 0.4);
+    border: 1px solid var(--divider);
+    border-radius: 2px;
+  }
+
+  @media (max-width: 640px) {
+    .session-meta { grid-template-columns: 1fr; }
+  }
+
+  label {
+    display: block;
+    font-family: var(--serif-display);
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.35rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  input[type="text"], input[type="date"], input[type="number"], textarea {
+    width: 100%;
+    background: var(--parchment);
+    border: 1px solid var(--divider);
+    border-radius: 2px;
+    padding: 0.6rem 0.8rem;
+    font-family: var(--serif-body);
+    font-size: 1rem;
+    color: var(--ink);
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--sienna);
+    background: #fbf5e4;
+  }
+
+  textarea {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.65;
+    font-size: 1.05rem;
+  }
+
+  /* ===== Stage cards ===== */
+  .stage {
+    margin-bottom: 2.2rem;
+    padding: 1.75rem 1.75rem 1.5rem;
+    background: rgba(255, 250, 235, 0.5);
+    border: 1px solid var(--divider);
+    border-radius: 2px;
+    position: relative;
+  }
+
+  .stage-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .stage-number {
+    font-family: var(--devanagari);
+    font-size: 2.2rem;
+    color: var(--sienna);
+    line-height: 1;
+    font-weight: 600;
+    min-width: 1.8rem;
+  }
+
+  .stage-title {
+    font-family: var(--serif-display);
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+
+  .stage-prompt {
+    font-family: var(--serif-body);
+    font-style: italic;
+    color: var(--ink-muted);
+    margin-bottom: 1rem;
+    margin-left: calc(1.8rem + 1rem);
+    font-size: 1.02rem;
+  }
+
+  @media (max-width: 640px) {
+    .stage-prompt { margin-left: 0; }
+  }
+
+  /* ===== Buttons ===== */
+  .btn-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+
+  button.btn {
+    font-family: var(--serif-display);
+    font-size: 1.05rem;
+    padding: 0.65rem 1.6rem;
+    border: 1px solid var(--ink-soft);
+    background: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.2s;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  button.btn:hover {
+    background: var(--ink-soft);
+    color: var(--parchment);
+  }
+
+  button.btn-primary {
+    background: var(--sienna);
+    color: var(--parchment);
+    border-color: var(--sienna);
+  }
+
+  button.btn-primary:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+
+  button.btn-danger {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  button.btn-danger:hover {
+    background: var(--danger);
+    color: var(--parchment);
+  }
+
+  button.btn-small {
+    font-size: 0.9rem;
+    padding: 0.4rem 1rem;
+  }
+
+  /* ===== Reflection list ===== */
+  .list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .list-count {
+    font-family: var(--serif-display);
+    font-style: italic;
+    color: var(--ink-muted);
+  }
+
+  .search-box {
+    max-width: 280px;
+  }
+
+  .reflection-card {
+    padding: 1.5rem 1.75rem;
+    background: rgba(255, 250, 235, 0.5);
+    border: 1px solid var(--divider);
+    border-radius: 2px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .reflection-card:hover {
+    border-color: var(--sienna);
+    background: rgba(255, 250, 235, 0.9);
+    transform: translateX(2px);
+  }
+
+  .card-date {
+    font-family: var(--serif-display);
+    font-size: 1.3rem;
+    color: var(--sienna);
+    margin-bottom: 0.2rem;
+    font-weight: 600;
+  }
+
+  .card-topic {
+    font-family: var(--serif-body);
+    font-size: 1.05rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+
+  .card-preview {
+    color: var(--ink-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    font-style: italic;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.8rem;
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+    font-family: var(--serif-display);
+    letter-spacing: 0.03em;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--ink-muted);
+  }
+
+  .empty-state .ornament {
+    font-family: var(--devanagari);
+    font-size: 3rem;
+    color: var(--divider);
+    margin-bottom: 1rem;
+  }
+
+  .empty-state p {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-size: 1.2rem;
+    line-height: 1.6;
+  }
+
+  /* ===== Detail view ===== */
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--divider);
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .detail-title-block h2 {
+    font-family: var(--serif-display);
+    font-size: 2.2rem;
+    font-weight: 500;
+    color: var(--sienna);
+    margin-bottom: 0.3rem;
+  }
+
+  .detail-meta {
+    color: var(--ink-muted);
+    font-style: italic;
+    font-size: 1rem;
+  }
+
+  .detail-stage {
+    margin-bottom: 2rem;
+  }
+
+  .detail-stage-title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .detail-stage-title .num {
+    font-family: var(--devanagari);
+    color: var(--sienna);
+    font-size: 1.8rem;
+    font-weight: 600;
+  }
+
+  .detail-stage-title .name {
+    font-family: var(--serif-display);
+    font-size: 1.4rem;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .detail-stage-content {
+    white-space: pre-wrap;
+    line-height: 1.75;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+    padding-left: 0.5rem;
+    border-left: 2px solid var(--divider);
+    padding-left: 1.25rem;
+  }
+
+  .detail-stage-content.empty {
+    color: var(--ink-muted);
+    font-style: italic;
+  }
+
+  /* ===== Data / Settings view ===== */
+  .data-section {
+    margin-bottom: 2.5rem;
+    padding: 2rem;
+    background: rgba(255, 250, 235, 0.5);
+    border: 1px solid var(--divider);
+    border-radius: 2px;
+  }
+
+  .data-section h3 {
+    font-family: var(--serif-display);
+    font-size: 1.5rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .data-section p {
+    color: var(--ink-muted);
+    margin-bottom: 1.2rem;
+    font-size: 0.98rem;
+  }
+
+  .file-input-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  input[type="file"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  /* ===== Toast ===== */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--ink);
+    color: var(--parchment);
+    padding: 0.9rem 1.8rem;
+    border-radius: 2px;
+    font-family: var(--serif-display);
+    font-size: 1.05rem;
+    letter-spacing: 0.03em;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  .toast.error { background: var(--danger); }
+
+  /* ===== Modal ===== */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(31, 26, 20, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    padding: 1rem;
+  }
+
+  .modal-backdrop.show { display: flex; }
+
+  .modal {
+    background: var(--parchment);
+    border: 1px solid var(--divider);
+    border-radius: 2px;
+    padding: 2rem;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .modal h3 {
+    font-family: var(--serif-display);
+    font-size: 1.6rem;
+    margin-bottom: 0.8rem;
+    color: var(--ink);
+  }
+
+  .modal p {
+    color: var(--ink-soft);
+    margin-bottom: 1.5rem;
+  }
+
+  /* ===== Footer ornament ===== */
+  footer {
+    text-align: center;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--divider);
+    color: var(--ink-muted);
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+
+  footer .om {
+    font-family: var(--devanagari);
+    font-size: 1.3rem;
+    color: var(--gold);
+    margin: 0 0.5rem;
+  }
+
+  /* ===== Print styles for manual backup ===== */
+  @media print {
+    nav, .btn-row, .data-section, footer { display: none !important; }
+    body { background: white; }
+    .container { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="devanagari-title">स्वाध्याय</div>
+    <h1>Svādhyāya</h1>
+    <div class="subtitle">A Reflection Journal for the Sanskrit Student</div>
+  </header>
+
+  <nav>
+    <button class="tab active" data-view="new">New Reflection</button>
+    <button class="tab" data-view="list">Past Reflections</button>
+    <button class="tab" data-view="data">Archive &amp; Backup</button>
+  </nav>
+
+  <!-- ===== NEW REFLECTION VIEW ===== -->
+  <section class="view active" id="view-new">
+    <form id="reflection-form">
+      <input type="hidden" id="reflection-id">
+
+      <div class="session-meta">
+        <div>
+          <label for="field-date">Date</label>
+          <input type="date" id="field-date" required>
+        </div>
+        <div>
+          <label for="field-topic">Session Topic</label>
+          <input type="text" id="field-topic" placeholder="e.g., Second declension of deva" required>
+        </div>
+        <div>
+          <label for="field-duration">Minutes</label>
+          <input type="number" id="field-duration" min="1" max="600" placeholder="45">
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="stage-header">
+          <span class="stage-number">१</span>
+          <span class="stage-title">Description</span>
+        </div>
+        <div class="stage-prompt">What happened? Record the concrete facts — texts studied, exercises completed, time spent.</div>
+        <textarea id="field-description" placeholder="I read verses 11–15 of Bhagavad Gītā chapter 2, worked through 20 vocabulary cards, and attempted to parse each word before checking the commentary..."></textarea>
+      </div>
+
+      <div class="stage">
+        <div class="stage-header">
+          <span class="stage-number">२</span>
+          <span class="stage-title">Feelings</span>
+        </div>
+        <div class="stage-prompt">What were you thinking and feeling? Name the emotions honestly — they flag where motivation leaks out.</div>
+        <textarea id="field-feelings" placeholder="Felt confident with nominative forms, but anxious when I hit the dual number — almost gave up..."></textarea>
+      </div>
+
+      <div class="stage">
+        <div class="stage-header">
+          <span class="stage-number">३</span>
+          <span class="stage-title">Evaluation</span>
+        </div>
+        <div class="stage-prompt">What worked and what didn't? Which techniques produced real understanding rather than the feeling of productivity?</div>
+        <textarea id="field-evaluation" placeholder="Reading aloud cemented pronunciation. Passively re-reading the grammar table didn't stick. Chanting helped..."></textarea>
+      </div>
+
+      <div class="stage">
+        <div class="stage-header">
+          <span class="stage-number">४</span>
+          <span class="stage-title">Analysis</span>
+        </div>
+        <div class="stage-prompt">Why did it go that way? Dig into the root cause — is it a missing foundation, or execution under pressure?</div>
+        <textarea id="field-analysis" placeholder="The sandhi rules I know in isolation collapse when I meet them in running text. The issue isn't effort but transfer..."></textarea>
+      </div>
+
+      <div class="stage">
+        <div class="stage-header">
+          <span class="stage-number">५</span>
+          <span class="stage-title">Conclusion</span>
+        </div>
+        <div class="stage-prompt">What have you learned? Turn the analysis into a crisp takeaway.</div>
+        <textarea id="field-conclusion" placeholder="I can recognize declensions in isolation but not in running text. I need more parsing practice, not more memorization..."></textarea>
+      </div>
+
+      <div class="stage">
+        <div class="stage-header">
+          <span class="stage-number">६</span>
+          <span class="stage-title">Action Plan</span>
+        </div>
+        <div class="stage-prompt">What will you do next? Commit to something specific and small.</div>
+        <textarea id="field-action" placeholder="Before each Gītā session, review the sandhi rules from the previous verse for 5 minutes. Add 3 compound-parsing exercises per week..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" class="btn" id="btn-clear">Clear</button>
+        <button type="submit" class="btn btn-primary" id="btn-save">Save Reflection</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ===== PAST REFLECTIONS VIEW ===== -->
+  <section class="view" id="view-list">
+    <div class="list-header">
+      <div class="list-count" id="list-count">No reflections yet</div>
+      <input type="text" id="search" class="search-box" placeholder="Search by topic or content…">
+    </div>
+    <div id="reflections-list"></div>
+  </section>
+
+  <!-- ===== DETAIL VIEW ===== -->
+  <section class="view" id="view-detail">
+    <div class="detail-header">
+      <div class="detail-title-block">
+        <h2 id="detail-topic"></h2>
+        <div class="detail-meta" id="detail-meta"></div>
+      </div>
+      <div class="btn-row" style="margin-top: 0;">
+        <button class="btn btn-small" id="btn-back">← Back</button>
+        <button class="btn btn-small" id="btn-edit">Edit</button>
+        <button class="btn btn-small btn-danger" id="btn-delete">Delete</button>
+      </div>
+    </div>
+    <div id="detail-content"></div>
+  </section>
+
+  <!-- ===== DATA / BACKUP VIEW ===== -->
+  <section class="view" id="view-data">
+    <div class="data-section">
+      <h3>Export as JSON</h3>
+      <p>Download all your reflections as a JSON file. Keep this somewhere safe — cloud drive, email to yourself, a backup folder. This is the file you would use to restore everything.</p>
+      <button class="btn btn-primary" id="btn-export-json">Download JSON Backup</button>
+    </div>
+
+    <div class="data-section">
+      <h3>Export as Markdown</h3>
+      <p>Download a human-readable archive of all reflections. Useful for reading, printing, or sharing with a teacher. Not intended for restoring back into this app.</p>
+      <button class="btn" id="btn-export-md">Download Markdown</button>
+    </div>
+
+    <div class="data-section">
+      <h3>Import from JSON</h3>
+      <p>Restore reflections from a previous backup. Existing entries with the same ID will be replaced; new ones will be added.</p>
+      <div class="file-input-wrapper">
+        <label for="file-import" class="btn" style="display: inline-block; cursor: pointer; text-transform: none; letter-spacing: normal;">Choose Backup File</label>
+        <input type="file" id="file-import" accept=".json,application/json">
+      </div>
+    </div>
+
+    <div class="data-section">
+      <h3>Clear All Data</h3>
+      <p>Permanently delete every reflection from this browser. Export a backup first if you want to keep them.</p>
+      <button class="btn btn-danger" id="btn-clear-all">Clear All Reflections</button>
+    </div>
+  </section>
+
+  <footer>
+    <span class="om">ॐ</span> svādhyāyān mā pramadaḥ <span class="om">ॐ</span><br>
+    <em>“Do not neglect your own study.” — Taittirīya Upaniṣad</em>
+  </footer>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Confirm</h3>
+    <p id="modal-message"></p>
+    <div class="btn-row">
+      <button class="btn" id="modal-cancel">Cancel</button>
+      <button class="btn btn-danger" id="modal-confirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ============================================================
+  // Storage
+  // ============================================================
+  const STORAGE_KEY = 'svadhyaya_reflections_v1';
+
+  const STAGES = [
+    { key: 'description', num: '१', name: 'Description' },
+    { key: 'feelings',    num: '२', name: 'Feelings' },
+    { key: 'evaluation',  num: '३', name: 'Evaluation' },
+    { key: 'analysis',    num: '४', name: 'Analysis' },
+    { key: 'conclusion',  num: '५', name: 'Conclusion' },
+    { key: 'action',      num: '६', name: 'Action Plan' }
+  ];
+
+  function loadAll() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      const data = JSON.parse(raw);
+      return Array.isArray(data) ? data : [];
+    } catch (e) {
+      console.error('Failed to load reflections:', e);
+      return [];
+    }
+  }
+
+  function saveAll(list) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      return true;
+    } catch (e) {
+      console.error('Failed to save:', e);
+      toast('Could not save — storage may be full or disabled', true);
+      return false;
+    }
+  }
+
+  function upsertReflection(r) {
+    const list = loadAll();
+    const idx = list.findIndex(x => x.id === r.id);
+    if (idx >= 0) list[idx] = r;
+    else list.push(r);
+    return saveAll(list);
+  }
+
+  function deleteReflection(id) {
+    const list = loadAll().filter(r => r.id !== id);
+    return saveAll(list);
+  }
+
+  function newId() {
+    return 'r_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+  }
+
+  // ============================================================
+  // UI helpers
+  // ============================================================
+  function $(sel) { return document.querySelector(sel); }
+  function $$(sel) { return document.querySelectorAll(sel); }
+
+  function toast(msg, isError = false) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.toggle('error', isError);
+    t.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function showModal(title, message) {
+    return new Promise(resolve => {
+      $('#modal-title').textContent = title;
+      $('#modal-message').textContent = message;
+      const modal = $('#modal');
+      modal.classList.add('show');
+
+      const cleanup = (result) => {
+        modal.classList.remove('show');
+        $('#modal-confirm').onclick = null;
+        $('#modal-cancel').onclick = null;
+        resolve(result);
+      };
+      $('#modal-confirm').onclick = () => cleanup(true);
+      $('#modal-cancel').onclick = () => cleanup(false);
+    });
+  }
+
+  function setView(name) {
+    $$('.view').forEach(v => v.classList.remove('active'));
+    $$('.tab').forEach(t => t.classList.remove('active'));
+    $('#view-' + name).classList.add('active');
+    const tab = document.querySelector('.tab[data-view="' + name + '"]');
+    if (tab) tab.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso + 'T00:00:00');
+    return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function escapeHtml(s) {
+    return (s || '').replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  // ============================================================
+  // Form
+  // ============================================================
+  function clearForm() {
+    $('#reflection-id').value = '';
+    $('#field-date').value = new Date().toISOString().slice(0, 10);
+    $('#field-topic').value = '';
+    $('#field-duration').value = '';
+    STAGES.forEach(s => {
+      const el = $('#field-' + (s.key === 'action' ? 'action' : s.key));
+      if (el) el.value = '';
+    });
+    $('#btn-save').textContent = 'Save Reflection';
+  }
+
+  function loadFormFor(id) {
+    const r = loadAll().find(x => x.id === id);
+    if (!r) return;
+    $('#reflection-id').value = r.id;
+    $('#field-date').value = r.date || '';
+    $('#field-topic').value = r.topic || '';
+    $('#field-duration').value = r.duration || '';
+    $('#field-description').value = r.description || '';
+    $('#field-feelings').value = r.feelings || '';
+    $('#field-evaluation').value = r.evaluation || '';
+    $('#field-analysis').value = r.analysis || '';
+    $('#field-conclusion').value = r.conclusion || '';
+    $('#field-action').value = r.action || '';
+    $('#btn-save').textContent = 'Update Reflection';
+    setView('new');
+  }
+
+  function collectForm() {
+    return {
+      id: $('#reflection-id').value || newId(),
+      date: $('#field-date').value,
+      topic: $('#field-topic').value.trim(),
+      duration: parseInt($('#field-duration').value, 10) || null,
+      description: $('#field-description').value.trim(),
+      feelings: $('#field-feelings').value.trim(),
+      evaluation: $('#field-evaluation').value.trim(),
+      analysis: $('#field-analysis').value.trim(),
+      conclusion: $('#field-conclusion').value.trim(),
+      action: $('#field-action').value.trim(),
+      updated: new Date().toISOString()
+    };
+  }
+
+  $('#reflection-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const r = collectForm();
+    if (!r.topic || !r.date) {
+      toast('Date and topic are required', true);
+      return;
+    }
+    if (upsertReflection(r)) {
+      toast('Reflection saved');
+      clearForm();
+      renderList();
+      setView('list');
+    }
+  });
+
+  $('#btn-clear').addEventListener('click', async () => {
+    const ok = await showModal('Clear form?', 'Any unsaved changes will be lost.');
+    if (ok) clearForm();
+  });
+
+  // ============================================================
+  // List
+  // ============================================================
+  function renderList(filter = '') {
+    const list = loadAll().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    const q = filter.trim().toLowerCase();
+    const filtered = q
+      ? list.filter(r =>
+          (r.topic || '').toLowerCase().includes(q) ||
+          (r.description || '').toLowerCase().includes(q) ||
+          (r.conclusion || '').toLowerCase().includes(q) ||
+          (r.action || '').toLowerCase().includes(q)
+        )
+      : list;
+
+    const count = $('#list-count');
+    if (list.length === 0) {
+      count.textContent = 'No reflections yet';
+    } else if (q) {
+      count.textContent = filtered.length + ' of ' + list.length + ' reflection' + (list.length === 1 ? '' : 's');
+    } else {
+      count.textContent = list.length + ' reflection' + (list.length === 1 ? '' : 's');
+    }
+
+    const container = $('#reflections-list');
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="ornament">ॐ</div><p>' +
+        (list.length === 0
+          ? 'Your journal awaits.<br>Begin with your first reflection.'
+          : 'No reflections match that search.') +
+        '</p></div>';
+      return;
+    }
+
+    container.innerHTML = filtered.map(r => {
+      const preview = r.conclusion || r.description || r.feelings || '';
+      return '<div class="reflection-card" data-id="' + escapeHtml(r.id) + '">' +
+        '<div class="card-date">' + escapeHtml(formatDate(r.date)) + '</div>' +
+        '<div class="card-topic">' + escapeHtml(r.topic || 'Untitled') + '</div>' +
+        (preview ? '<div class="card-preview">' + escapeHtml(preview) + '</div>' : '') +
+        '<div class="card-meta">' +
+          (r.duration ? '<span>' + r.duration + ' min</span>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    container.querySelectorAll('.reflection-card').forEach(card => {
+      card.addEventListener('click', () => showDetail(card.dataset.id));
+    });
+  }
+
+  $('#search').addEventListener('input', e => renderList(e.target.value));
+
+  // ============================================================
+  // Detail
+  // ============================================================
+  let currentDetailId = null;
+
+  function showDetail(id) {
+    const r = loadAll().find(x => x.id === id);
+    if (!r) return;
+    currentDetailId = id;
+
+    $('#detail-topic').textContent = r.topic || 'Untitled';
+    const metaParts = [formatDate(r.date)];
+    if (r.duration) metaParts.push(r.duration + ' minutes');
+    $('#detail-meta').textContent = metaParts.join(' · ');
+
+    const content = $('#detail-content');
+    content.innerHTML = STAGES.map(s => {
+      const val = r[s.key] || '';
+      return '<div class="detail-stage">' +
+        '<div class="detail-stage-title">' +
+          '<span class="num">' + s.num + '</span>' +
+          '<span class="name">' + s.name + '</span>' +
+        '</div>' +
+        '<div class="detail-stage-content' + (val ? '' : ' empty') + '">' +
+          escapeHtml(val || '(left blank)') +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    setView('detail');
+  }
+
+  $('#btn-back').addEventListener('click', () => setView('list'));
+
+  $('#btn-edit').addEventListener('click', () => {
+    if (currentDetailId) loadFormFor(currentDetailId);
+  });
+
+  $('#btn-delete').addEventListener('click', async () => {
+    if (!currentDetailId) return;
+    const ok = await showModal('Delete this reflection?', 'This cannot be undone. Consider exporting a backup first.');
+    if (ok) {
+      deleteReflection(currentDetailId);
+      currentDetailId = null;
+      renderList();
+      setView('list');
+      toast('Reflection deleted');
+    }
+  });
+
+  // ============================================================
+  // Export / Import
+  // ============================================================
+  function download(filename, content, mime) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function todayStamp() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  $('#btn-export-json').addEventListener('click', () => {
+    const data = {
+      schema: 'svadhyaya_v1',
+      exportedAt: new Date().toISOString(),
+      reflections: loadAll()
+    };
+    download('svadhyaya-backup-' + todayStamp() + '.json', JSON.stringify(data, null, 2), 'application/json');
+    toast('Backup downloaded');
+  });
+
+  $('#btn-export-md').addEventListener('click', () => {
+    const list = loadAll().sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    if (list.length === 0) {
+      toast('Nothing to export yet', true);
+      return;
+    }
+    let md = '# Svādhyāya — Sanskrit Reflection Journal\n\n';
+    md += '*Exported ' + new Date().toLocaleString() + '*\n\n';
+    md += '---\n\n';
+    list.forEach(r => {
+      md += '## ' + (r.topic || 'Untitled') + '\n\n';
+      md += '**Date:** ' + formatDate(r.date);
+      if (r.duration) md += '  \n**Duration:** ' + r.duration + ' minutes';
+      md += '\n\n';
+      STAGES.forEach(s => {
+        md += '### ' + s.num + '. ' + s.name + '\n\n';
+        md += (r[s.key] || '*(left blank)*') + '\n\n';
+      });
+      md += '---\n\n';
+    });
+    download('sanskrit-reflection-journal-' + todayStamp() + '.md', md, 'text/markdown');
+    toast('Markdown archive downloaded');
+  });
+
+  $('#file-import').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const incoming = Array.isArray(data) ? data : data.reflections;
+      if (!Array.isArray(incoming)) {
+        toast('File does not contain reflections', true);
+        return;
+      }
+      const current = loadAll();
+      const map = new Map(current.map(r => [r.id, r]));
+      let added = 0, updated = 0;
+      incoming.forEach(r => {
+        if (!r || !r.id) return;
+        if (map.has(r.id)) updated++;
+        else added++;
+        map.set(r.id, r);
+      });
+      if (saveAll(Array.from(map.values()))) {
+        toast('Imported: ' + added + ' new, ' + updated + ' updated');
+        renderList();
+      }
+    } catch (err) {
+      toast('Could not read that file', true);
+      console.error(err);
+    } finally {
+      e.target.value = '';
+    }
+  });
+
+  $('#btn-clear-all').addEventListener('click', async () => {
+    const ok = await showModal(
+      'Delete everything?',
+      'This will permanently remove all reflections from this browser. Export a JSON backup first if you want to keep them.'
+    );
+    if (ok) {
+      localStorage.removeItem(STORAGE_KEY);
+      renderList();
+      toast('All reflections cleared');
+      setView('list');
+    }
+  });
+
+  // ============================================================
+  // Tabs
+  // ============================================================
+  $$('.tab').forEach(t => {
+    t.addEventListener('click', () => setView(t.dataset.view));
+  });
+
+  // ============================================================
+  // Init
+  // ============================================================
+  clearForm();
+  renderList();
+</script>
+</body>
+</html>
