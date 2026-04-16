@@ -4,7 +4,7 @@
 
 <img src="screenshot.png" alt="Svādhyāya journal" style="max-width:600px; width:100%; height:auto;">
 
-**[Try it →](https://tadigotla.github.io/sanskrit-reflection-journal/)** · No account. No sign-up. Your data stays in your browser.
+**[Try it →](https://tadigotla.github.io/svadhyaya/)** · No account. No sign-up. Your data stays in your browser.
 
 ---
 
@@ -29,7 +29,7 @@ Gibbs' Reflective Cycle gives you a framework for that kind of honest audit. And
 
 ## How to use it
 
-**Online:** visit the [GitHub Pages link](https://tadigotla.github.io/sanskrit-reflection-journal) above.
+**Online:** visit the [GitHub Pages link](https://tadigotla.github.io/svadhyaya) above.
 
 **Offline:** download `index.html` and open it in your browser. That's it. No server, no build step, no installation. Bookmark the file or pin it to a folder you see often.
 
