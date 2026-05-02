@@ -2623,21 +2623,51 @@
 
   async function handleSignIn() {
     setCloudStatus('Loading sign-in…', '');
+    // Mark the device as signing-in before starting the flow. Two reasons:
+    //  (1) For redirect-based sign-in, when the page reloads after the OAuth round-trip,
+    //      maybeRestoreSession() needs the marker to know to attach the auth listener.
+    //  (2) For popup-based sign-in on first use, this lets attachAuthListener() run below
+    //      so onAuthStateChanged is wired up before signInWithPopup resolves.
+    // Cleared on failure so a cancelled sign-in doesn't leave a "this device signed in" lie
+    // that would cause Firebase to load eagerly on next page open (spec 7.7).
+    let markerSet = false;
+    try { localStorage.setItem(SIGN_IN_MARKER, '1'); markerSet = true; } catch (e) { /* noop */ }
     try {
       const fb = await ensureFirebase();
+      await attachAuthListener();
       const provider = new fb.authMod.GoogleAuthProvider();
       // Localhost: redirect-based sign-in. Popups are silently blocked by Safari (and some
       // Chrome configs) when there's any delay between the user gesture and the popup open,
-      // which is exactly what happens here because the SDK is dynamically imported. Redirect
-      // sidesteps the popup-blocker entirely. Production keeps popup for the better UX.
+      // which is exactly what happens here because the SDK is dynamically imported.
       if (isLocalDev()) {
         await fb.authMod.signInWithRedirect(fb.auth, provider);
-        // Page navigates away; control flow does not return here.
-        return;
+        return; // page navigates away
       }
-      await fb.authMod.signInWithPopup(fb.auth, provider);
-      // onAuthStateChanged below picks up the new user on production.
+      // Production: popup first for the better UX. Fall back to redirect when the popup is
+      // blocked or closes immediately — common in privacy-focused browsers (Zen, Brave with
+      // strict shields, Safari with ITP, Firefox + tracking protection on third-party cookies).
+      const popupStart = Date.now();
+      try {
+        await fb.authMod.signInWithPopup(fb.auth, provider);
+      } catch (e) {
+        const code = e && e.code;
+        const closedFast = code === 'auth/popup-closed-by-user' && (Date.now() - popupStart) < 2000;
+        const blocked =
+          code === 'auth/popup-blocked' ||
+          code === 'auth/cancelled-popup-request' ||
+          code === 'auth/operation-not-supported-in-this-environment' ||
+          code === 'auth/web-storage-unsupported';
+        if (blocked || closedFast) {
+          setCloudStatus('Pop-up unavailable — redirecting to Google…', '');
+          await fb.authMod.signInWithRedirect(fb.auth, provider);
+          return; // page navigates away
+        }
+        throw e;
+      }
     } catch (e) {
+      if (markerSet) {
+        try { localStorage.removeItem(SIGN_IN_MARKER); } catch (err) { /* noop */ }
+      }
       const code = e && e.code;
       let msg = 'Sign-in failed. Please try again.';
       if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
@@ -2753,8 +2783,13 @@
   }
 
   // Watch auth state. The listener fires once on attach (with current user or null) and
-  // whenever sign-in / sign-out happens.
+  // whenever sign-in / sign-out happens. Idempotent: safe to call from multiple init paths
+  // (maybeRestoreSession on reload, handleSignIn on first sign-in). Multiple onAuthStateChanged
+  // attachments would otherwise produce duplicate onUserSignedIn calls per state change.
+  let _authListenerAttached = false;
   async function attachAuthListener() {
+    if (_authListenerAttached) return;
+    _authListenerAttached = true;
     const fb = await ensureFirebase();
     fb.authMod.onAuthStateChanged(fb.auth, async (user) => {
       if (user) {
