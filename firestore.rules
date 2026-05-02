@@ -1,0 +1,27 @@
+rules_version = '2';
+
+// Svādhyāya — Firestore security rules
+//
+// Per the cloud-sync spec ("Firestore security rules enforce per-user isolation"),
+// authenticated users may read and write only their own entries. All other paths,
+// authenticated or not, are denied.
+//
+// The data model lives under: /users/{uid}/entries/{entryId}
+// Reflection content is encrypted client-side before being written here, so even a
+// rules bypass would only expose ciphertext + IV + non-sensitive metadata.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Per-user namespace: any path under /users/{uid}/** is gated on auth.uid == uid.
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId;
+    }
+
+    // Default deny — anything outside /users/{uid}/** is unreachable.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
