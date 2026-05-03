@@ -1164,6 +1164,7 @@
       </div>
       <div class="btn-row" style="margin-top: 1rem; justify-content: flex-start;">
         <button type="button" class="btn btn-primary" id="btn-sign-in">Sign in with Google</button>
+        <button type="button" class="btn" id="btn-cloud-sync-now" hidden>Sync now</button>
         <button type="button" class="btn btn-danger" id="btn-sign-out" hidden>Sign out</button>
       </div>
     </div>
@@ -2602,6 +2603,7 @@
     const signedIn = !!currentUser;
     $('#btn-sign-in').hidden = signedIn;
     $('#btn-sign-out').hidden = !signedIn;
+    $('#btn-cloud-sync-now').hidden = !signedIn;
     $('#cloud-user-block').hidden = !signedIn;
     if (signedIn) {
       const photo = $('#cloud-user-photo');
@@ -2697,8 +2699,44 @@
     toast('Signed out');
   }
 
+  // Manual full-sync. Useful when offline writes piled up before the user signed in,
+  // when the migration prompt was answered before Firestore was reachable, or when
+  // the user just wants reassurance after editing on a flaky connection. cloudSaveEntry
+  // uses setDoc with the entry id, so re-running is idempotent — existing cloud docs are
+  // overwritten with the same encrypted contents, no duplicates.
+  async function handleSyncNow() {
+    if (!currentUser || !currentMasterKey) {
+      setCloudStatus('Sign in and unlock with your passphrase before syncing.', 'err');
+      return;
+    }
+    const btn = $('#btn-cloud-sync-now');
+    const local = loadAll();
+    if (local.length === 0) {
+      setCloudStatus('No local reflections to sync.', '');
+      return;
+    }
+    btn.disabled = true;
+    const originalLabel = btn.textContent;
+    let ok = 0, fail = 0;
+    for (let i = 0; i < local.length; i++) {
+      setCloudStatus(`Syncing reflections to cloud… ${i + 1}/${local.length}`, '');
+      try { await cloudSaveEntry(local[i]); ok++; }
+      catch (e) { fail++; }
+    }
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+    if (fail === 0) {
+      setCloudStatus(`Synced ${ok} reflection${ok === 1 ? '' : 's'} to the cloud.`, 'ok');
+      toast(`Synced ${ok} reflection${ok === 1 ? '' : 's'}`);
+    } else {
+      setCloudStatus(`Synced ${ok}; ${fail} failed. Check your connection and try again.`, 'err');
+      toast(`Synced ${ok}; ${fail} failed`, true);
+    }
+  }
+
   $('#btn-sign-in').addEventListener('click', () => { handleSignIn(); });
   $('#btn-sign-out').addEventListener('click', () => { handleSignOut(); });
+  $('#btn-cloud-sync-now').addEventListener('click', () => { handleSyncNow(); });
 
   // ============================================================
   // On sign-in: derive/restore master key, run smoke test,

@@ -1,5 +1,6 @@
 {
   "projects": {
+    "default": "svadhyaya-c1165",
     "sb-svadhyaya": "api-project-740454028949"
   },
   "targets": {},
